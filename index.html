@@ -1,0 +1,77 @@
+import { useState, useEffect } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+
+// a bunch of cool queen facts, cleaned up a bit for readability
+const facts = [
+  "Fun Fact: John Deacon has three nipples.",
+  "Fun Fact: Brian May wrote 'All Dead, All Dead' about his cat, Plixie.",
+  "Fun Fact: Roger Taylor's nickname was 'Sex on Two Legs'.",
+  "Fun Fact: Roger once locked himself in a cupboard to get 'I'm In Love With My Car' on the B-side of 'A Night at the Opera'.",
+  "Fun Fact: 'Cool Cat' was originally going to feature David Bowie.",
+  "Fun Fact: 'Brighton Rock' was nicknamed 'Brighton F***' in the studio.",
+  "Fun Fact: Freddie originally called 'Bohemian Rhapsody' 'The Cowboy Song'.",
+  "Fun Fact: Queen's logo includes all the band members' zodiac signs.",
+  "Fun Fact: John Deacon is the only member who never released a solo album.",
+  "Fun Fact: Brian May was furious when Roger and Deacon released 'Made in Heaven' without him.",
+  "Fun Fact: The videos for ‘We Will Rock You’ and ‘Spread Your Wings’ were both shot in Roger’s backyard.",
+  "Fun Fact: Queen's fan club is the longest-running rock band fan club in the world, according to the Guinness Book of Records.",
+  "Fun Fact: Queen got their star on the Hollywood Walk of Fame in 2002.",
+  "Fun Fact: Freddie wanted to fix his overbite but was afraid it might affect his voice.",
+  "Fun Fact: Freddie made his assistants carry a notepad at all times in case he had a sudden burst of inspiration.",
+  "Fun Fact: The line in ‘Life Is Real’ (“guilt stains on my pillow”) originally started as something way more explicit, but Mercury’s assistant convinced him to change it.",
+  "Fun Fact: Freddie once dressed Princess Diana in drag and snuck her into a gay club.",
+  "Fun Fact: Queen had three different bass players before settling on John Deacon. They were Mike Grose, Barry Mitchell, and Doug Bogie.",
+  "Fun Fact: Brian May’s astrophysics thesis can be read online here: https://core.ac.uk/download/pdf/295744.pdf",
+  "Fun Fact: Freddie was terrified of spiders.",
+  "Fun Fact: Freddie’s funeral service was conducted by a Zoroastrian priest.",
+  "Fun Fact: Before fame, Freddie worked at Heathrow Airport—years later, the airport made a weird dance tribute for him i guess: https://youtu.be/bzMP9zsoHME",
+  "Fun Fact: At 13, Freddie formed his first band, The Hectics, covering rock and roll songs at school events.",
+  "Fun Fact: Kiss drummer Eric Carr passed away on the same day as Freddie Mercury, November 24, 1991."
+];
+
+// function to get a random fact
+const getRandomFact = () => facts[Math.floor(Math.random() * facts.length)];
+
+export default function QueenFacts() {
+  const [dayFact, setDayFact] = useState(getRandomFact());
+  const [hourFact, setHourFact] = useState(getRandomFact());
+  const [minuteFact, setMinuteFact] = useState(getRandomFact());
+  const [randomFact, setRandomFact] = useState(getRandomFact());
+
+  // update facts at specific time intervals
+  useEffect(() => {
+    const updateHourFact = setInterval(() => setHourFact(getRandomFact()), 3600000);
+    const updateMinuteFact = setInterval(() => setMinuteFact(getRandomFact()), 60000);
+    return () => {
+      clearInterval(updateHourFact);
+      clearInterval(updateMinuteFact);
+    };
+  }, []);
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-gray-900 text-white rounded-2xl shadow-lg text-center">
+      <h1 className="text-3xl font-bold mb-4">Queen Facts Generator</h1>
+      <Tabs defaultValue="day" className="w-full">
+        <TabsList className="flex justify-center gap-2 mb-4">
+          <TabsTrigger value="day">Fact of the Day</TabsTrigger>
+          <TabsTrigger value="hour">Fact of the Hour</TabsTrigger>
+          <TabsTrigger value="minute">Fact of the Minute</TabsTrigger>
+        </TabsList>
+        <TabsContent value="day">
+          <p className="text-lg">{dayFact}</p>
+        </TabsContent>
+        <TabsContent value="hour">
+          <p className="text-lg">{hourFact}</p>
+        </TabsContent>
+        <TabsContent value="minute">
+          <p className="text-lg">{minuteFact}</p>
+        </TabsContent>
+      </Tabs>
+      <Button onClick={() => setRandomFact(getRandomFact())} className="mt-4 w-full">
+        Generate Random Fact
+      </Button>
+      <p className="mt-2 text-lg">{randomFact}</p>
+    </div>
+  );
+}
