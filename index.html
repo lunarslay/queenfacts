@@ -1,77 +1,113 @@
-import { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-
-// a bunch of cool queen facts, cleaned up a bit for readability
-const facts = [
-  "Fun Fact: John Deacon has three nipples.",
-  "Fun Fact: Brian May wrote 'All Dead, All Dead' about his cat, Plixie.",
-  "Fun Fact: Roger Taylor's nickname was 'Sex on Two Legs'.",
-  "Fun Fact: Roger once locked himself in a cupboard to get 'I'm In Love With My Car' on the B-side of 'A Night at the Opera'.",
-  "Fun Fact: 'Cool Cat' was originally going to feature David Bowie.",
-  "Fun Fact: 'Brighton Rock' was nicknamed 'Brighton F***' in the studio.",
-  "Fun Fact: Freddie originally called 'Bohemian Rhapsody' 'The Cowboy Song'.",
-  "Fun Fact: Queen's logo includes all the band members' zodiac signs.",
-  "Fun Fact: John Deacon is the only member who never released a solo album.",
-  "Fun Fact: Brian May was furious when Roger and Deacon released 'Made in Heaven' without him.",
-  "Fun Fact: The videos for ‘We Will Rock You’ and ‘Spread Your Wings’ were both shot in Roger’s backyard.",
-  "Fun Fact: Queen's fan club is the longest-running rock band fan club in the world, according to the Guinness Book of Records.",
-  "Fun Fact: Queen got their star on the Hollywood Walk of Fame in 2002.",
-  "Fun Fact: Freddie wanted to fix his overbite but was afraid it might affect his voice.",
-  "Fun Fact: Freddie made his assistants carry a notepad at all times in case he had a sudden burst of inspiration.",
-  "Fun Fact: The line in ‘Life Is Real’ (“guilt stains on my pillow”) originally started as something way more explicit, but Mercury’s assistant convinced him to change it.",
-  "Fun Fact: Freddie once dressed Princess Diana in drag and snuck her into a gay club.",
-  "Fun Fact: Queen had three different bass players before settling on John Deacon. They were Mike Grose, Barry Mitchell, and Doug Bogie.",
-  "Fun Fact: Brian May’s astrophysics thesis can be read online here: https://core.ac.uk/download/pdf/295744.pdf",
-  "Fun Fact: Freddie was terrified of spiders.",
-  "Fun Fact: Freddie’s funeral service was conducted by a Zoroastrian priest.",
-  "Fun Fact: Before fame, Freddie worked at Heathrow Airport—years later, the airport made a weird dance tribute for him i guess: https://youtu.be/bzMP9zsoHME",
-  "Fun Fact: At 13, Freddie formed his first band, The Hectics, covering rock and roll songs at school events.",
-  "Fun Fact: Kiss drummer Eric Carr passed away on the same day as Freddie Mercury, November 24, 1991."
-];
-
-// function to get a random fact
-const getRandomFact = () => facts[Math.floor(Math.random() * facts.length)];
-
-export default function QueenFacts() {
-  const [dayFact, setDayFact] = useState(getRandomFact());
-  const [hourFact, setHourFact] = useState(getRandomFact());
-  const [minuteFact, setMinuteFact] = useState(getRandomFact());
-  const [randomFact, setRandomFact] = useState(getRandomFact());
-
-  // update facts at specific time intervals
-  useEffect(() => {
-    const updateHourFact = setInterval(() => setHourFact(getRandomFact()), 3600000);
-    const updateMinuteFact = setInterval(() => setMinuteFact(getRandomFact()), 60000);
-    return () => {
-      clearInterval(updateHourFact);
-      clearInterval(updateMinuteFact);
-    };
-  }, []);
-
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-900 text-white rounded-2xl shadow-lg text-center">
-      <h1 className="text-3xl font-bold mb-4">Queen Facts Generator</h1>
-      <Tabs defaultValue="day" className="w-full">
-        <TabsList className="flex justify-center gap-2 mb-4">
-          <TabsTrigger value="day">Fact of the Day</TabsTrigger>
-          <TabsTrigger value="hour">Fact of the Hour</TabsTrigger>
-          <TabsTrigger value="minute">Fact of the Minute</TabsTrigger>
-        </TabsList>
-        <TabsContent value="day">
-          <p className="text-lg">{dayFact}</p>
-        </TabsContent>
-        <TabsContent value="hour">
-          <p className="text-lg">{hourFact}</p>
-        </TabsContent>
-        <TabsContent value="minute">
-          <p className="text-lg">{minuteFact}</p>
-        </TabsContent>
-      </Tabs>
-      <Button onClick={() => setRandomFact(getRandomFact())} className="mt-4 w-full">
-        Generate Random Fact
-      </Button>
-      <p className="mt-2 text-lg">{randomFact}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Queen Facts Generator</title>
+  <!-- I'm using Tailwind CSS from a CDN to give the page a modern, clean look -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* This is just to show which tab is active */
+    .active-tab {
+      border-bottom: 2px solid #3b82f6; /* blue, because why not */
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="max-w-xl w-full p-6 bg-gray-800 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-center mb-6">Queen Facts Generator</h1>
+    <!-- Here are my tabs for switching between fact types -->
+    <div class="flex justify-center mb-4" id="tabs">
+      <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="day">Fact of the Day</button>
+      <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="hour">Fact of the Hour</button>
+      <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="minute">Fact of the Minute</button>
     </div>
-  );
-}
+    <!-- This area will display the fact based on your chosen tab -->
+    <div id="content" class="text-center text-xl mb-4">
+      <!-- A random fact will be shown here when you click a tab -->
+    </div>
+    <!-- Button to generate a totally random fact -->
+    <div class="text-center">
+      <button id="randomBtn" class="mt-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Generate Random Fact</button>
+    </div>
+    <!-- The random fact appears here when you click the button -->
+    <div id="randomContent" class="mt-4 text-center text-xl"></div>
+  </div>
+
+  <script>
+    // Here’s the list of Queen facts I put together (yes, even the links are in there!)
+    const facts = [
+      "Fun Fact: John Deacon has three nipples.",
+      "Fun Fact: Brian May wrote 'All Dead, All Dead' about his cat, Plixie.",
+      "Fun Fact: Roger Taylor's nickname was 'Sex on Two Legs'.",
+      "Fun Fact: Roger once locked himself in a cupboard to get 'I'm In Love With My Car' on the B-side of 'A Night at the Opera'.",
+      "Fun Fact: 'Cool Cat' was originally going to feature David Bowie.",
+      "Fun Fact: 'Brighton Rock' was nicknamed 'Brighton F***' in the studio.",
+      "Fun Fact: Freddie originally called 'Bohemian Rhapsody' 'The Cowboy Song'.",
+      "Fun Fact: Queen's logo includes all the band members' zodiac signs.",
+      "Fun Fact: John Deacon is the only member who never released a solo album.",
+      "Fun Fact: Brian May was furious when Roger and Deacon released 'Made in Heaven' without him.",
+      "Fun Fact: The videos for 'We Will Rock You' and 'Spread Your Wings' were both shot in Roger’s backyard.",
+      "Fun Fact: Queen's fan club is the longest-running rock band fan club in the world, according to the Guinness Book of Records.",
+      "Fun Fact: Queen got their star on the Hollywood Walk of Fame in 2002.",
+      "Fun Fact: Freddie wanted to fix his overbite but was afraid it might affect his voice.",
+      "Fun Fact: Freddie made his assistants carry a notepad at all times in case he had a sudden burst of inspiration.",
+      "Fun Fact: The line in 'Life Is Real' originally started as something way more explicit, but Mercury’s assistant convinced him to change it.",
+      "Fun Fact: Freddie once dressed Princess Diana in drag and snuck her into a gay club.",
+      "Fun Fact: Queen had three different bass players before settling on John Deacon. They were Mike Grose, Barry Mitchell, and Doug Bogie.",
+      "Fun Fact: Brian May’s astrophysics thesis can be read online here: https://core.ac.uk/download/pdf/295744.pdf",
+      "Fun Fact: Freddie was terrified of spiders.",
+      "Fun Fact: Freddie’s funeral service was conducted by a Zoroastrian priest.",
+      "Fun Fact: Before fame, Freddie worked at Heathrow Airport—years later, the airport made a dance tribute for him: https://youtu.be/bzMP9zsoHME",
+      "Fun Fact: At 13, Freddie formed his first band, The Hectics, covering rock and roll songs at school events.",
+      "Fun Fact: Kiss drummer Eric Carr passed away on the same day as Freddie Mercury, November 24, 1991."
+    ];
+    
+    // Simple function to grab a random fact from the list
+    function getRandomFact() {
+      return facts[Math.floor(Math.random() * facts.length)];
+    }
+    
+    // Get references to the DOM elements we need to work with
+    const contentEl = document.getElementById("content");
+    const randomContentEl = document.getElementById("randomContent");
+    let currentTab = "day"; // default tab is "day"
+    
+    // This function updates the fact area based on the tab you've selected.
+    // Right now it just shows a random fact; you can change this later if needed.
+    function updateTabContent(tab) {
+      currentTab = tab;
+      contentEl.textContent = getRandomFact();
+    }
+    
+    // Set up event listeners on each tab button
+    document.querySelectorAll(".tab-button").forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const tab = e.target.getAttribute("data-tab");
+        updateTabContent(tab);
+        // Clear the active style from all buttons and then add it to the one you just clicked
+        document.querySelectorAll(".tab-button").forEach((btn) => btn.classList.remove("active-tab"));
+        e.target.classList.add("active-tab");
+      });
+    });
+    
+    // Initialize the page with the default tab's content
+    updateTabContent(currentTab);
+    document.querySelector(`[data-tab="${currentTab}"]`).classList.add("active-tab");
+    
+    // When you click the random fact button, show a new fact below the button
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      randomContentEl.textContent = getRandomFact();
+    });
+    
+    // Optional: If you happen to be on the Hour or Minute tab, update the fact automatically.
+    setInterval(() => {
+      if (currentTab === "hour") updateTabContent("hour");
+    }, 3600000); // update every hour
+    
+    setInterval(() => {
+      if (currentTab === "minute") updateTabContent("minute");
+    }, 60000); // update every minute
+  </script>
+</body>
+</html>
