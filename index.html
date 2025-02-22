@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Queen Facts Generator</title>
-  <!-- I'm using Tailwind CSS from a CDN for a modern, clean design -->
+  <!-- I'm using Tailwind CSS from a CDN because I like a sleek, modern look -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Active tab styling – just a subtle blue underline */
+    /* I added a simple blue underline for the active tab */
     .active-tab {
       border-bottom: 2px solid #3b82f6;
     }
-    /* The hue-wrapper animates the entire site to shift hue slowly (a 20° swing is nice and subtle) */
+    /* This wrapper will slowly shift the hue of the whole site. I chose a 30° swing over 60 seconds – subtle but noticeable. */
     #hue-wrapper {
-      animation: hueShift 120s linear infinite;
+      animation: hueShift 60s linear infinite;
     }
     @keyframes hueShift {
-      0% { filter: hue-rotate(0deg); }
-      50% { filter: hue-rotate(20deg); }
+      0%   { filter: hue-rotate(0deg); }
+      50%  { filter: hue-rotate(30deg); }
       100% { filter: hue-rotate(0deg); }
     }
   </style>
@@ -25,26 +25,26 @@
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
   <div id="hue-wrapper" class="max-w-xl w-full p-6 bg-gray-800 rounded-lg shadow-lg">
     <h1 class="text-3xl font-bold text-center mb-6">Queen Facts Generator</h1>
-    <!-- Tabs for selecting which fact to display -->
+    <!-- These are my tabs for selecting which fact to show -->
     <div class="flex justify-center mb-4" id="tabs">
       <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="day">Fact of the Day</button>
       <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="hour">Fact of the Hour</button>
       <button class="tab-button px-4 py-2 mx-2 bg-gray-700 rounded hover:bg-gray-600" data-tab="minute">Fact of the Minute</button>
     </div>
-    <!-- This area shows the daily/hourly/minute fact in a big, bold font -->
+    <!-- Big fact display (I like the text big so it stands out) -->
     <div id="content" class="text-center text-3xl mb-4">
-      <!-- Fact will be injected here based on your selected tab -->
+      <!-- The fact will show up here based on your tab selection -->
     </div>
-    <!-- Button for those moments when you're extra impatient -->
+    <!-- Button for when you’re extra impatient -->
     <div class="text-center">
       <button id="randomBtn" class="mt-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Generate if Impatient</button>
     </div>
-    <!-- Random fact will appear here when you click the button -->
+    <!-- Random fact appears here -->
     <div id="randomContent" class="mt-4 text-center text-xl"></div>
   </div>
-
+  
   <script>
-    // Here's the complete list of Queen facts (including the links, because why hide cool details?)
+    // Here's my personal list of Queen facts – links, quirky details, and all.
     const facts = [
       "Fun Fact: John Deacon has three nipples.",
       "Fun Fact: Brian May wrote 'All Dead, All Dead' about his cat, Plixie.",
@@ -72,12 +72,12 @@
       "Fun Fact: Kiss drummer Eric Carr passed away on the same day as Freddie Mercury, November 24, 1991."
     ];
     
-    // For the random (impatient) button – nothing fancy here
+    // This function just picks a completely random fact from my list
     function getRandomFact() {
       return facts[Math.floor(Math.random() * facts.length)];
     }
     
-    // A simple hash function to generate a number from a string seed (keeps things consistent)
+    // A simple hash function to get a number from a string (so I can have a consistent random result)
     function hashString(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -86,64 +86,80 @@
       return hash;
     }
     
-    // This returns the same fact every time for a given seed
+    // Returns the same fact for a given seed so it doesn't change randomly
     function getDeterministicFact(seed) {
       const hash = Math.abs(hashString(seed));
       return facts[hash % facts.length];
     }
     
-    // Get references to the content areas
+    // I want the daily, hourly, and minute facts to only update when the actual time period changes.
+    // I store the seeds and facts so switching tabs doesn't re-compute a new fact.
+    let currentDaySeed = '';
+    let currentHourSeed = '';
+    let currentMinuteSeed = '';
+    
+    let dailyFact = '';
+    let hourlyFact = '';
+    let minuteFact = '';
+    
     const contentEl = document.getElementById("content");
     const randomContentEl = document.getElementById("randomContent");
-    let currentTab = "day"; // default tab is 'day'
+    let currentTab = "day"; // default is the day tab
     
-    // Update the fact display based on the selected tab and current time
-    function updateTabContent(tab) {
+    // This function checks if the time period has changed, and if so, updates the corresponding fact.
+    function updateFacts() {
       const now = new Date();
-      let seed = "";
-      if (tab === "day") {
-        // This fact changes once per day – neat and steady.
-        seed = now.toISOString().split('T')[0];
-      } else if (tab === "hour") {
-        // Changing every hour.
-        seed = now.toISOString().split('T')[0] + now.getHours();
-      } else if (tab === "minute") {
-        // Changes every minute.
-        seed = now.toISOString().split('T')[0] + now.getHours() + now.getMinutes();
+      const newDaySeed = now.toISOString().split('T')[0]; // e.g., "2025-02-22"
+      const newHourSeed = newDaySeed + now.getHours();    // e.g., "2025-02-2221" for 9 PM
+      const newMinuteSeed = newDaySeed + now.getHours() + now.getMinutes(); // e.g., "2025-02-22215" for 21:5
+      
+      if (newDaySeed !== currentDaySeed) {
+        currentDaySeed = newDaySeed;
+        dailyFact = getDeterministicFact(currentDaySeed);
+        if (currentTab === 'day') contentEl.textContent = dailyFact;
       }
-      contentEl.textContent = getDeterministicFact(seed);
+      if (newHourSeed !== currentHourSeed) {
+        currentHourSeed = newHourSeed;
+        hourlyFact = getDeterministicFact(currentHourSeed);
+        if (currentTab === 'hour') contentEl.textContent = hourlyFact;
+      }
+      if (newMinuteSeed !== currentMinuteSeed) {
+        currentMinuteSeed = newMinuteSeed;
+        minuteFact = getDeterministicFact(currentMinuteSeed);
+        if (currentTab === 'minute') contentEl.textContent = minuteFact;
+      }
     }
     
-    // Set up tab click events to switch facts and update active styling
+    // Set up the tab buttons so that clicking one just shows the pre-computed fact.
     document.querySelectorAll('.tab-button').forEach((button) => {
       button.addEventListener('click', (e) => {
         const tab = e.target.getAttribute('data-tab');
         currentTab = tab;
-        updateTabContent(tab);
-        // Remove active styling from all tabs then add it to the clicked one
+        if (tab === 'day') {
+          contentEl.textContent = dailyFact;
+        } else if (tab === 'hour') {
+          contentEl.textContent = hourlyFact;
+        } else if (tab === 'minute') {
+          contentEl.textContent = minuteFact;
+        }
+        // Update which tab looks active
         document.querySelectorAll('.tab-button').forEach((btn) => btn.classList.remove('active-tab'));
         e.target.classList.add('active-tab');
       });
     });
     
-    // Initialize with the default tab's fact
-    updateTabContent(currentTab);
+    // Do an initial fact computation when the page loads.
+    updateFacts();
+    contentEl.textContent = dailyFact;
     document.querySelector(`[data-tab="${currentTab}"]`).classList.add('active-tab');
     
-    // If on the Hour or Minute tab, update the fact when time rolls over
-    setInterval(() => {
-      if (currentTab === 'hour') updateTabContent('hour');
-    }, 60000); // check every minute
+    // Check every second if it's time to update any fact (daily, hourly, or minute).
+    setInterval(updateFacts, 1000);
     
-    setInterval(() => {
-      if (currentTab === 'minute') updateTabContent('minute');
-    }, 1000); // check every second
-    
-    // When "Generate if Impatient" is clicked, show a fresh random fact below
+    // When you're really impatient, clicking this button gives you a totally random fact.
     document.getElementById('randomBtn').addEventListener('click', () => {
       randomContentEl.textContent = getRandomFact();
     });
   </script>
 </body>
 </html>
-
